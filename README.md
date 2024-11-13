@@ -24,3 +24,7 @@ L'objectif de cette manipulation est de provoquer des conflits d'édition, qui s
 - YASMINE Achraf - achraf.yasmine@etu.univ-nantes.fr
 - HO Hugo - hugo.ho@etu.univ-nantes.fr
 - GIROUX Esteban - esteban.giroux@etu.univ-nantes.fr
+#quand on essaye de git pull alors qu'on a pas commit nos changements ou stash, la cmd refuse de pull et nous dis de soit stash les changements soit de les commit, il vaut mieux les stash 
+#pour stash des changements il faut faire git stash 
+#pour enlever les changements en stash il faut faire git clear stash 
+
