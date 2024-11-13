@@ -23,3 +23,4 @@ L'objectif de cette manipulation est de provoquer des conflits d'édition, qui s
 - Berrada Hamza - hamza.berrada@etu.univ-nantes.fr
 - YASMINE Achraf1 - achraf.yasmine@etu.univ-nantes.fr
 - HO Hugo - hugo.ho@etu.univ-nantes.fr
+- GIROUX Esteban - esteban.giroux@etu.univ-nantes.fr
