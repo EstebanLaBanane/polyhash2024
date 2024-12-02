@@ -4,7 +4,7 @@
 """Module de parsing des fichiers d'entrée pour la mise en oeuvre du projet Poly#.
 """
 import re
-
+#testhamza
 def parse_challenge(filename: str) -> object:
     """Lit un fichier de challenge et extrait les informations nécessaires.
 
@@ -17,7 +17,7 @@ def parse_challenge(filename: str) -> object:
         # Strip everything after #
         line = re.sub(r'\s*#.*', '', line)
         rows, columns, altitudes = [ int(v) for v in line.split() ]
-
+        challenge= (rows,columns,altitudes)
         # ...
 
     return challenge
