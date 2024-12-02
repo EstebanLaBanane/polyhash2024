@@ -17,7 +17,7 @@ def parse_challenge(filename: str) -> object:
         # Strip everything after #
         line = re.sub(r'\s*#.*', '', line)
         rows, columns, altitudes = [ int(v) for v in line.split() ]
-
+        challenge= (rows,columns,altitudes)
         # ...
 
     return challenge
