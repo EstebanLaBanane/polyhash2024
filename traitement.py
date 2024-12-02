@@ -64,25 +64,33 @@ def WindReading(fichier:str,NbTargetCells:int,RowMap:int,ColMap:int,AltMap:int):
     n = 3 + NbTargetCells
     line = ""
     for j in range(n+RowMap*AltMap):
-        if j <= n:
+        if j < n:
             f.readline()
         else:
             line += f.readline()
     L = line.split()
     for i in range(len(L)):
         L[i] = int(L[i])
-    for z in range(len(L)):
-        M=[]
-
-
-
-
-    """for k in range(len(L)):
-        if k % 2 == 0:
-            RowTargetCell = L[k]
-            ColTargetCell = L[k + 1]
-            yield RowTargetCell, ColTargetCell"""
+    M=[]
+    while len(L)!=0:
+        tmp=[]
+        for i in range(2):
+            tmp.append(L.pop(0))
+        M.append(tmp)
+    M2=[]
+    while len(M)!=0:
+        tmp=[]
+        for i in range(ColMap):
+            tmp.append(M.pop(0))
+        M2.append(tmp)
+    M3=[]
+    while len(M2)!=0:
+        tmp=[]
+        for i in range(AltMap):
+            tmp.append(M2.pop(0))
+        M3.append(tmp)
     f.close()
+    return M3
 
 
 
