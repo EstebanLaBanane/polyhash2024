@@ -59,5 +59,4 @@ class Map:
             for cell in cells_row:
                 if cell.is_target:
                     targets.append(cell)
-        #print(targets)
         return targets
