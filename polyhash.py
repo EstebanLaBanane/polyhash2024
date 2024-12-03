@@ -1,38 +1,33 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-"""Module principal pour la mise en oeuvre du projet Poly#.
-"""
-
-# Vous pouvez structurer votre code en modules pour améliorer la
-# compréhension et faciliter le travail collaboratif
-from polyparser import parse_challenge
-from polysolver import solve, score_solution, save_solution
-
-if __name__ == "__main__":
-    # On fournit ici un exemple permettant de passer un simple
-    # argument (le fichier du challenge) en paramètre. N'hésitez pas à
-    # compléter avec d'autres paramètres/options, en consultant la
-    # documentation du module argparse:
-    # https://docs.python.org/3/library/argparse.html
-
-    import argparse
-    parser = argparse.ArgumentParser(description='Solve Poly# challenge.')
-    parser.add_argument('challenge', type=str,
-                        help='challenge definition filename',
-                        metavar="challenge.txt")
-    parser.add_argument('output', type=str, default=None,
-                        help='output filename',
-                        metavar="sortie.txt")
-    args = parser.parse_args()
-
-    challenge = parse_challenge(args.challenge)
-    solution = solve(challenge)
-    if args.output is not None:
-        # Sauvegarder le fichier généré
-        save_solution(args.output, solution)
-        print(f"Solution saved in {args.output}")
-    print(f"Score: {score_solution(solution)}")
+import sys
+from create_game        import create_game
+from game               import Game
+from get_instructions   import get_instructions
+from algos.rando_algo   import rando_algo
+from gui                import show_game
 
 
-#SUPER !
+from balloon import Balloon
+
+def main()-> None:
+    source = sys.argv[1]
+    destination = sys.argv[2]
+    destination_f = open(destination,'w')
+
+    game = create_game(source)
+
+    algorithm = rando_algo
+
+    while game.turns > 0:
+        instruction = get_instructions(game,algorithm)
+        # if any([b.is_alive for b in game.balloons]):
+        show_game(game)
+        game.update(instruction)
+        instruction_str = ""
+        for balloon_cmd in instruction:
+            instruction_str += str(balloon_cmd) + " "
+        instruction_str =instruction_str[:-1] + "\n"
+        destination_f.write(instruction_str)
+    destination_f.close()
+    print("Score final : {}".format(str(game.score)))
+
+main()
