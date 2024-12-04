@@ -1,7 +1,7 @@
 from game       import Game
 from random     import *
 
-seed(123)
+seed(3)
 
 def rando_algo(g : Game) -> list[int]:    
     instruction = []

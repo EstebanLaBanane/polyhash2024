@@ -6,7 +6,7 @@ class Map:
     rows        : int
     cols        : int
     nb_altitudes   : int
-    cells       : list[Cell]
+    cells       : list[list[Cell]]
 
     def __init__(self,start_row : int, start_col : int, rows : int, cols : int, nb_altitudes : int, winds,target_pos):
         self.start_row      = start_row
@@ -21,7 +21,6 @@ class Map:
 
     def create_map(self,winds, targets_pos):
         cell_map = []
-        #[[[], [], [], [], []], [[], [], [], [], []], [[], [], [], [], []]]
         for i in range(self.rows):
             cell_map.append([])
             for j in range(self.cols):

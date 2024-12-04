@@ -44,8 +44,6 @@ class Game:
     def apply_winds(self):
         for balloon in self.balloons:
             if balloon.is_alive and balloon.altitude != 0:
-                if balloon.balloon_id == 1:
-                    print(balloon, balloon.cell.get_wind(balloon.altitude))
                 wind_to_apply = balloon.cell.get_wind(balloon.altitude)
                 current_cell_col = balloon.cell.col
                 current_cell_row = balloon.cell.row

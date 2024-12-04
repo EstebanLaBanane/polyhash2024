@@ -22,4 +22,5 @@ def create_game(file_path, DEBUG_MODE) -> Game:
         canvas = create_canvas()    
     
     game = Game(balloons,game_map,turns,canvas)
+
     return game

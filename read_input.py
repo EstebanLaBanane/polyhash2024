@@ -28,12 +28,12 @@ def read(filepath):
     indice_debut_vents = 3+nb_tgt_cell
 
     for i in range(nb_alt):
-        vents_altitudes.append(data[indice_debut_vents+i*nb_alt:indice_debut_vents+i*nb_alt+nb_row])
-
+        vents_altitudes.append(data[indice_debut_vents+(i*nb_row):indice_debut_vents+(i*nb_row)+nb_row])
+    
     formatted_vent = []
     for _ in range(nb_alt):
         formatted_vent.append([])
-
+    
     counter = -1
 
     for vents_alt in vents_altitudes:
@@ -42,5 +42,6 @@ def read(filepath):
             vents_alt_row = vents_alt_row.split(' ')
             for i in range(0, len(vents_alt_row)-1,2):
                 formatted_vent[counter].append([int(vents_alt_row[i]),int(vents_alt_row[i+1])])
+
 
     return nb_row, nb_col, nb_alt, nb_tgt_cell, cov_r, nb_balloon, turns, start_row, start_col, targets_pos, formatted_vent
