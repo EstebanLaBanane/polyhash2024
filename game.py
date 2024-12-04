@@ -41,8 +41,8 @@ class Game:
                 wind_to_apply = balloon.cell.get_wind(balloon.altitude)
                 current_cell_col = balloon.cell.col
                 current_cell_row = balloon.cell.row
-                new_col = (current_cell_col + wind_to_apply[0]) % self.game_map.cols
-                new_row = current_cell_row + wind_to_apply[1]
+                new_row = current_cell_row + wind_to_apply[0]
+                new_col = (current_cell_col + wind_to_apply[1]) % self.game_map.cols
 
                 if new_row < 0 or new_row >= self.game_map.rows:
                     balloon.is_alive = False
