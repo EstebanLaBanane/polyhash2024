@@ -14,21 +14,13 @@ class Balloon:
         self.coverage_radius    = coverage_radius
         self.balloon_id         = balloon_id
 
-
     def __str__(self):
-        return "B {}, C : {}, A : {}, OK {};".format(self.balloon_id,self.cell,self.altitude,self.is_alive)
+        return "Ballon {}, cellule : {}, altitude : {}, alive {}".format(self.balloon_id,self.cell,self.altitude,self.is_alive)
 
     def __repr__(self):
-        return "B {}, C : {}, A : {}, OK {};".format(self.balloon_id,self.cell,self.altitude, self.is_alive)
+         return "Ballon {}, cellule : {}, altitude : {}, alive {}".format(self.balloon_id,self.cell,self.altitude, self.is_alive)
 
-
-    # def __str__(self):
-    #     return "Ballon {}, cellule : {}, altitude : {}, alive {}".format(self.balloon_id,self.cell,self.altitude,self.is_alive)
-
-    # def __repr__(self):
-    #     return "Ballon {}, cellule : {}, altitude : {}, alive {}".format(self.balloon_id,self.cell,self.altitude, self.is_alive)
-
-    def death(self):
-        self.cell = dead_cell
-        self.is_alive = False
-        self.altitude = 0
+    # def death(self):
+    #     self.cell = dead_cell
+    #     self.is_alive = False
+    #     self.altitude = 0
