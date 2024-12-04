@@ -1,4 +1,4 @@
-from cell import Cell,dead_cell
+from cell import Cell
 
 class Balloon:
     cell                : Cell
