@@ -22,4 +22,5 @@ class Cell:
     
     
     def get_wind(self, altitude : int):
+        print(self, self.winds)
         return self.winds[altitude-1]

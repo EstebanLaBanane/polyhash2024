@@ -1,18 +1,22 @@
 from balloon    import Balloon
 from map        import Map
 from cell       import Cell
+from tkinter    import Canvas
 
 class Game:
     balloons    : list[Balloon]
     game_map    : Map
     turns       : int
     score       : int
+    canva       : Canvas
 
-    def __init__(self,balloons : list[Balloon], game_map : Map, turns : int,score = 0):
+    def __init__(self,balloons : list[Balloon], game_map : Map, turns : int,canva : Canvas | None = None):
         self.balloons   = balloons
         self.game_map   = game_map
         self.turns      = turns
-        self.score      = score
+        self.score      = 0
+        self.canva      = canva
+        
 
     # Bouge le ballon verticalement :
         # Si action impossible renvoie Exception
@@ -53,7 +57,7 @@ class Game:
 
     # Si target pas précisé, check toutes les targets
     def check_covers(self,balloon : Balloon,target : Cell) -> bool:
-        if (balloon.cell.row == -1 and balloon.cell.col == -1) or balloon.altitude==0:
+        if (balloon.cell.row == -1 and balloon.cell.col == -1):
             return False
         balloon_r   = balloon.cell.row
         balloon_c   = balloon.cell.col

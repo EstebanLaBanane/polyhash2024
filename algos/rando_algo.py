@@ -1,8 +1,9 @@
 from game       import Game
-from random     import randint
+from random     import *
 
+seed(123)
 
-def rando_algo(g : Game) -> list[int]:
+def rando_algo(g : Game) -> list[int]:    
     instruction = []
     for balloon in g.balloons:
         if not balloon.is_alive:
