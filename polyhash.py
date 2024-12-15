@@ -30,9 +30,9 @@ def main()-> None:
         instruction_str =instruction_str[:-1] + "\n"
         destination_f.write(instruction_str)
         
-        # if any([b.is_alive for b in game.balloons]):
-        #     show_game(game)
-        #     time.sleep(2)
+        if any([b.is_alive for b in game.balloons]):
+             show_game(game)
+             time.sleep(2)
 
     destination_f.close()
     print("Score final : {}".format(str(game.score)))
