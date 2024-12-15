@@ -1,4 +1,4 @@
-from .cell import Cell
+from polyhash2024.cell import Cell
 
 class Map:
     start_row   : int

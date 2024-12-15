@@ -9,9 +9,10 @@ def create_canvas():
     return canva
 
 def show_game(g : Game):
-    root = Tk()
+    root1 = Tk()
     g.canva.delete("all")
-    w, h = root.winfo_screenwidth(), root.winfo_screenheight() - 50
+    w, h = root1.winfo_screenwidth(), root1.winfo_screenheight() - 50
+    root1.destroy()
     nb_col  = g.game_map.cols
     lar_col = (w-50) / nb_col
 
