@@ -3,28 +3,28 @@ from game       import Game
 
 def create_canvas():
     root = Tk()
-
-    canva = Canvas(root,width=1900,height=1025,background='skyblue')
+    w, h = root.winfo_screenwidth(), root.winfo_screenheight()-50
+    canva = Canvas(root,width=w,height=h,background='skyblue')
 
     return canva
 
 def show_game(g : Game):
-
+    root = Tk()
     g.canva.delete("all")
-
+    w, h = root.winfo_screenwidth(), root.winfo_screenheight() - 50
     nb_col  = g.game_map.cols
-    lar_col = 1850 / nb_col
+    lar_col = (w-50) / nb_col
 
     nb_row  = g.game_map.rows
-    lar_row = 975 / nb_row
+    lar_row = (h-50) / nb_row
 
 # Creation grille verticale
     for i in range(0,nb_col+1):
-        l = g.canva.create_line(i*lar_col+25,25,i*lar_col+25,1000)
+        l = g.canva.create_line(i*lar_col+25,25,i*lar_col+25,h-25)
 
 # Creation grille horizontale
     for i in range(0,nb_row+1):
-        l = g.canva.create_line(25,i*lar_row+25,1875,i*lar_row+25)
+        l = g.canva.create_line(25,i*lar_row+25,w-25,i*lar_row+25)
 
 # Affichage des targets
     for t in g.game_map.get_targets():
