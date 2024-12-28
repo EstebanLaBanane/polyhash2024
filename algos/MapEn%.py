@@ -1,6 +1,6 @@
 from cut_map import *
 from polyhash2024.map import Map
-
+from Decoupe_OPT import cut_map_optimise
 #print(cut_map("../challenges/a_example.in"))
 #print(score_of_cells("../challenges/a_example.in"))
 
@@ -9,18 +9,19 @@ def concentration_cells_pts(file_path):
     nb_row, nb_col, nb_alt, nb_tgt_cell, cov_r, nb_balloon, turns, start_row, start_col, targets_pos, vents_alt = read(file_path)
     game_map = Map(start_row, start_col, nb_row, nb_col, nb_alt, vents_alt, targets_pos)
     Maps=[]
-    for elem in cut_map(file_path):
+    for elem in cut_map_optimise(file_path):
          Maps.append(elem)
+
     dict_cell_pts=score_of_cells(file_path)
+
     #calcule pour une map la concentration de points
     def concentration_par_map(mapcut: list, cell_pt: dict, game_map: Map) -> int:
-        totalpt = sum(cell_pt.values())
         score = 0
         for i in range(len(mapcut)):
             row_cell, col_cell = mapcut[i][0], mapcut[i][1]
             cellrecherche = game_map.get_cell(row_cell, col_cell)
             score += cell_pt[cellrecherche.id]
-        return (score * 100) // totalpt
+        return score
     #calcul de concentration de pt pour chaque partie de map
     dict_map_score={}
     for i in range(len(Maps)):
@@ -30,4 +31,4 @@ def concentration_cells_pts(file_path):
     return dict_map_score
 
 
-print(concentration_cells_pts("../challenges/a_example.in"))
+#print(concentration_cells_pts("../challenges/c_medium.in"))

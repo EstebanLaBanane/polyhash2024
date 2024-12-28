@@ -1,5 +1,5 @@
 10 20 2 # rows cols altitudes
-10 2 2 20 # target_count cov_radius ballon_count turn_count
+10 1 2 20 # target_count cov_radius ballon_count turn_count
 5 10 # launching coordinates
 9 0  # coords target 0
 4 0  # coords target 1

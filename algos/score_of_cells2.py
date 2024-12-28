@@ -2,57 +2,48 @@ from polyhash2024.read_input import read
 
 
 def score_of_cells(filepath):
+    # Lecture des données
     nb_row, nb_col, nb_alt, nb_tgt_cell, cov_r, nb_balloon, turns, start_row, start_col, targets_pos, formatted_vent = read(filepath)
-    score_map={}
-    list_id_targets=[]
 
+    # Convertir les cibles en un ensemble pour des recherches plus rapides
+    targets_set = set(tg_row * nb_col + tg_col for tg_row, tg_col in targets_pos)
 
-    #on fait la liste des id des targets
-    for target in targets_pos:
-        tg_row=target[0]
-        tg_col=target[1]
+    # Pré-générer les offsets pour les cellules couvertes par un ballon
+    def generate_coverage_offsets():
+        offsets = []
+        for dr in range(-cov_r, cov_r + 1):
+            for dc in range(-cov_r, cov_r + 1):
+                if dr**2 + min(dc % nb_col, nb_col - dc % nb_col)**2 <= cov_r**2:
+                    offsets.append((dr, dc))
+        return offsets
 
-        cell_id=tg_row*nb_col+tg_col
-        list_id_targets.append(cell_id)
+    coverage_offsets = generate_coverage_offsets()
 
-
-
-
-    #on fait une fonction qui en prenant une cell elle donne une liste de toutes les cases touchées (en imaginant que il y'a un balloon dessus)
-
-    def calculate_list_cov_cells(id_cell,cell_col,cell_row,list_cov_cells:list):
-        list_cov_cells.append(id_cell)
-        for row in range (nb_row):
-            for col in range(nb_col):
-                cell_to_cov_id=row*nb_col+col
-                if (cell_row-row)**2+min(abs(cell_col-col),nb_col-(abs(cell_col-col)))**2<=cov_r**2 and row*nb_col+col not in list_cov_cells:
-                    list_cov_cells.append(row*nb_col+col)
-        return list_cov_cells
-
-
-
-    #on crée le dict cell_scores qui aura comme clé l'indice d'une cellule et comme valeur son score
-
-    cell_scores={}
-    map=[]
+    # Calcul des scores des cellules
+    cell_scores = {}
     for row in range(nb_row):
         for col in range(nb_col):
-            map.append([row,col])
-    for i in range(len(map)):
-        cell_cords=map[i]
-        cell_row=cell_cords[0]
-        cell_col=cell_cords[1]
-        id=nb_col*cell_row + cell_col
-        if id not in cell_scores:
-            cell_scores[id]=0
-        list_cov_cells=calculate_list_cov_cells(id,cell_col,cell_row,[])
-        for target in list_id_targets:
-            if target in list_cov_cells:
-                cell_scores[id]+=1
+            cell_id = row * nb_col + col
+            if cell_id not in cell_scores:
+                cell_scores[cell_id] = 0
+
+            # Parcourir les cellules couvertes
+            for dr, dc in coverage_offsets:
+                # Calculer les coordonnées des cellules couvertes
+                covered_row = row + dr
+                covered_col = (col + dc) % nb_col  # Gestion des colonnes circulaires
+
+                # Vérifier si la cellule couverte est une cible
+                if 0 <= covered_row < nb_row:  # Vérifier les bornes
+                    covered_id = covered_row * nb_col + covered_col
+                    if covered_id in targets_set:
+                        cell_scores[cell_id] += 1
 
     return cell_scores
 
-#print(score_of_cells("../challenges/a_example.in"))
+
+
+#print(score_of_cells("../challenges/c_medium.in"))
 #idée: il faut trouver des patterns de suite de chiffres >0 de suite. exemple : "1 3 4 5 54 8 9"
 
 
