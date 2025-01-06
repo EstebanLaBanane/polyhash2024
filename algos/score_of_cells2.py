@@ -1,4 +1,4 @@
-from polyhash2024.read_input import read
+from read_input import read
 
 
 def score_of_cells(filepath):

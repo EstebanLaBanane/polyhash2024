@@ -1,8 +1,10 @@
-from cut_map import *
-from polyhash2024.map import Map
-from Decoupe_OPT import cut_map_optimise
+from algos.cut_map import *
+from map import Map
+from algos.Decoupe_OPT import cut_map_optimise
 #print(cut_map("../challenges/a_example.in"))
 #print(score_of_cells("../challenges/a_example.in"))
+from algos.score_of_cells2 import score_of_cells
+
 
 def concentration_cells_pts(file_path):
     #initialisation
@@ -31,4 +33,4 @@ def concentration_cells_pts(file_path):
     return dict_map_score
 
 
-#print(concentration_cells_pts("../challenges/c_medium.in"))
+#print(concentration_cells_pts("../challenges/b_small.in"))

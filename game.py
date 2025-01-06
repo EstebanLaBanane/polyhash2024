@@ -34,7 +34,7 @@ class Game:
                 raise Exception("Action impossible (Altitude maximum atteinte)")  
               
         elif action == -1:
-            if balloon.altitude <= 1:
+            if balloon.altitude <=1:
                 raise Exception("Action impossible (On ne pas descendre un ballon au sol une fois lancé ou en dessous le sol)")
             
             balloon.altitude -= 1

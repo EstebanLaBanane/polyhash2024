@@ -1,5 +1,4 @@
-from score_of_cells2 import score_of_cells
-from polyhash2024.read_input import read
+from read_input import read
 
 
 def cut_map(filepath):

@@ -3,6 +3,7 @@ from random     import *
 
 seed(3)
 
+#pour chaque tour il donne des instructions à tous les ballons
 def rando_algo(g : Game) -> list[int]:    
     instruction = []
     for balloon in g.balloons:
@@ -14,5 +15,6 @@ def rando_algo(g : Game) -> list[int]:
             action = randint(-1,0)
         else:
             action = randint(-1,1)
-        instruction.append(action)    
+        instruction.append(action)
+
     return instruction
