@@ -6,6 +6,7 @@ class Balloon:
     altitude            : int
     coverage_radius     : int
     balloon_id          : int
+    memoire_positions : list # [ [ row_pos,col_pos,alt ] ]
 
     def __init__(self, cell : Cell, altitude : int, coverage_radius :int,balloon_id : int):
         self.cell               = cell
@@ -13,6 +14,7 @@ class Balloon:
         self.altitude           = altitude
         self.coverage_radius    = coverage_radius
         self.balloon_id         = balloon_id
+        self.memoire_positions = []
 
     def __str__(self):
         return "Ballon {}, cellule : {}, altitude : {}, alive {}".format(self.balloon_id,self.cell,self.altitude,self.is_alive)
