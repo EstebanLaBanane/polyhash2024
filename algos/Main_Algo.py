@@ -52,16 +52,17 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
     row_eff = (zone_eff) ** (1 / 2)
     col_eff = (zone_eff) ** (1 / 2)
     for ballon in g.balloons:
-        zone_assigne=dictBallonZone[ballon.balloon_id]
-        bloc_destination=MapBloc[zone_assigne]
-        liste_centres_bloc=Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
+
         #possible de regler l'assignation juste dans ce bloc
         #probleme ici
         if ballon.balloon_id not in ballon_vers_centre.keys():
             #if len(liste_centres_bloc)==1:
             #    attribuer_centre(ballon, liste_centres_bloc)
             #else :
-            attribuer_centre_unique(ballon,liste_centres_bloc)
+            zone_assigne=dictBallonZone[ballon.balloon_id]
+            bloc_destination=MapBloc[zone_assigne]
+            liste_centres_bloc=Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
+            attribuer_centre(ballon,liste_centres_bloc)
 
             print(liste_centres_bloc)
             print(ballon_vers_centre)
