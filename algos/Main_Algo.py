@@ -7,11 +7,26 @@ import map
 #un dictionnaire globale sous forme de idBallon : coord [34,32]
 from .distance_cells import distance_cells
 
+global dict_id_cycle
 global dict_ancienne_pos
+global liste_eviter
 global ballon_vers_centre
+global deja_choisi
 ballon_vers_centre={}
 dict_ancienne_pos={}
+dict_id_cycle={}
+liste_eviter=[]
+deja_choisi=[]
 
+def contient_doublons(liste):
+    vus = set()
+    for element in liste:
+        if isinstance(element, list):
+            element = tuple(element)
+        if element in vus:
+            return True
+        vus.add(element)
+    return False
 
 
 def trouver_cle_par_valeur(dictionnaire, valeur_recherchee):
@@ -22,6 +37,7 @@ def trouver_cle_par_valeur(dictionnaire, valeur_recherchee):
 
 def attribuer_centre_unique(ballon, liste_centres_bloc):
     global ballon_vers_centre
+    centre=[]
     #type [int,int]
     if  isinstance(liste_centres_bloc,list) and all(isinstance(x, int) for x in liste_centres_bloc) and len(liste_centres_bloc) == 2:
         centre = liste_centres_bloc
@@ -32,7 +48,10 @@ def attribuer_centre_unique(ballon, liste_centres_bloc):
                 centre=centre1
                 break
     if isinstance(centre,list) and all(isinstance(x, int) for x in centre) and len(centre) == 2:
-        ballon_vers_centre[ballon.balloon_id] = centre
+        if centre==[]:
+            return None
+        else:
+            ballon_vers_centre[ballon.balloon_id] = centre
 
 
 def attribuer_centre(ballon,liste_centres_bloc):
@@ -50,6 +69,7 @@ def attribuer_centre(ballon,liste_centres_bloc):
 def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
     global ballon_vers_centre
     instructions=[]
+    action=float('inf')
     cov_r = g.balloons[0].coverage_radius
     row_map=g.game_map.rows
     col_map=g.game_map.cols
@@ -57,68 +77,9 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
     row_eff = (zone_eff) ** (1 / 2)
     col_eff = (zone_eff) ** (1 / 2)
     for ballon in g.balloons:
-<<<<<<< HEAD
-
-        #possible de regler l'assignation juste dans ce bloc
-        #probleme ici
-        if ballon.balloon_id not in ballon_vers_centre.keys():
-            #if len(liste_centres_bloc)==1:
-            #    attribuer_centre(ballon, liste_centres_bloc)
-            #else :
-            zone_assigne=dictBallonZone[ballon.balloon_id]
-            bloc_destination=MapBloc[zone_assigne]
-            liste_centres_bloc=Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
-            attribuer_centre(ballon,liste_centres_bloc)
-
-            print(liste_centres_bloc)
-            print(ballon_vers_centre)
-        #aller vers le centre
-        #pour  altitude en 0 et 1 et -1 on met la distance entre la nouvelle cellule du ballon et target
-        Liste_alt={}
-        #probleme ici
-        #cas sol : monter
-        if ballon.altitude==0:
-            action=1
-        #cas pres du sol : monter ou rester
-        elif ballon.altitude-1==0:
-            #cas rester
-            wind_to_apply = ballon.cell.get_wind(ballon.altitude)
-            current_cell_col = ballon.cell.col
-            current_cell_row = ballon.cell.row
-            new_row = current_cell_row + wind_to_apply[0]
-            new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-            print("row,col:",[new_row,new_col])
-            #deadcell renvoit dict id : [safe,killer,safe,safe] altitude courante = altitude-1
-            if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude-1] == 'safe':
-                if wind_to_apply==[0,0]:
-                    Liste_alt[ballon.altitude] = float('inf')
-                else:
-                    dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
-                    Liste_alt[ballon.altitude] = dist
-            else:
-                Liste_alt[ballon.altitude] = float('inf')
-            #cas monter
-            wind_to_apply = ballon.cell.get_wind(ballon.altitude+1)
-            current_cell_col = ballon.cell.col
-            current_cell_row = ballon.cell.row
-            new_row = current_cell_row + wind_to_apply[0]
-            new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-            print("row,col:",[new_row, new_col])
-            if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude] == 'safe':
-                dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
-                Liste_alt[ballon.altitude+1] = dist
-            else:
-                Liste_alt[ballon.altitude+1]=float('inf')
-            #choisir l'altitude à prendre
-            dist_min=min(Liste_alt.values())
-            print(dist_min)
-            alt_min=trouver_cle_par_valeur(Liste_alt,dist_min)
-            if ballon.altitude==alt_min:
-=======
         #on commence par voir si on est dans le tour de random du debut:
-        if g.turns != g.max_turn and g.turns > g.max_turn-2:
+        if g.turns != g.max_turn and g.turns > g.max_turn-10:
             if not ballon.is_alive:
->>>>>>> 557ec586951b60a984e1845913f87ebaed41c0e4
                 action = 0
             elif ballon.altitude <= 1:
                 action = randint(0, 1)
@@ -126,204 +87,311 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                 action = randint(-1, 0)
             else:
                 action = randint(-1, 1)
-            instructions.append(action)
         else:
-
-            if ballon.is_alive==False:
+            # 3 solutions pour cycle : 1 random, 2 deuxieme dist, 3 attribuer centre
+            if ballon.is_alive == False:
                 print("ballon mort")
                 instructions.append(0)
             else:
-                zone_assigne=dictBallonZone[ballon.balloon_id]
-                bloc_destination=MapBloc[zone_assigne]
-                liste_centres_bloc=Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
-                #possible de regler l'assignation juste dans ce bloc
-                #probleme ici
+                centre_sans_cycle = 0
+                zone_assigne = dictBallonZone[ballon.balloon_id]
+                bloc_destination = MapBloc[zone_assigne]
+                liste_centres_bloc = Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
+                print(liste_centres_bloc)
+                Liste_alt = {}
+
+                #si on fait 10 tours on efface la mémoire
+                i=10
+                if g.turns%i==0:
+                    ballon.memoire_positions.clear()
+
                 if ballon.balloon_id not in ballon_vers_centre.keys():
-                    #if len(liste_centres_bloc)==1:
-                    #    attribuer_centre(ballon, liste_centres_bloc)
-                    #else :
-                    attribuer_centre_unique(ballon,liste_centres_bloc)
+                    if [ballon.cell.row, ballon.cell.col] in bloc_destination:
+                        if attribuer_centre_unique(ballon, liste_centres_bloc) != None:
+                            attribuer_centre_unique(ballon, liste_centres_bloc)
+                        else:
+                            attribuer_centre(ballon, liste_centres_bloc)
+                    else:
+                        attribuer_centre(ballon, liste_centres_bloc)
+                # initialisation
+                if ballon.balloon_id not in dict_id_cycle:
+                        dict_id_cycle[ballon.balloon_id] = False
 
+
+                # lorsque le dictionnaire est complet et on atteint un nb_ntour
+                print(g.turns)
+                if (dict_id_cycle[ballon.balloon_id] == True) and (len(dict_id_cycle) == len(g.balloons) ): #and (g.turns <= (g.max_turn - 30)):#40
+                    for k in dict_id_cycle:
+                        if dict_id_cycle[k] == False and (k not in liste_eviter) and (k not in deja_choisi):
+                            deja_choisi.append(k)
+                            centre_sans_cycle = k
+                            break
+
+
+                    print(centre_sans_cycle)
+                    zone_assigne = dictBallonZone[centre_sans_cycle]
+                    bloc_destination = MapBloc[zone_assigne]
+                    liste_centres_bloc = Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
+                    attribuer_centre(ballon, liste_centres_bloc)
                     print(liste_centres_bloc)
-                    print(ballon_vers_centre)
-                #aller vers le centre
-                #pour  altitude en 0 et 1 et -1 on met la distance entre la nouvelle cellule du ballon et target
-                Liste_alt={}
-                #probleme ici
-                #cas sol : monter
-                if ballon.altitude==0:
-                    action=1
-                    ballon.memoire_positions.append([ballon.cell.row,ballon.cell.col,ballon.altitude])
+
+                # attribuer_centre(ballon, liste_centres_bloc)
+                #print(centre_sans_cycle)
+                print("a eviter:",liste_eviter)
+                print("deja choisi",deja_choisi)
+                print("dict_id_cycle:", dict_id_cycle)
+                print("balon id :",ballon.balloon_id)
+                print("turns :",g.turns)
+                print(liste_centres_bloc)
+                print(ballon_vers_centre)
+                # aller vers le centre
+                # pour  altitude en 0 et 1 et -1 on met la distance entre la nouvelle cellule du ballon et target
+
+                # probleme ici
+                # cas sol : monter
+                if ballon.altitude == 0:
+                    action = 1
+                    ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
                     print(ballon.memoire_positions)
-                #cas pres du sol : monter ou rester
-                elif ballon.altitude-1==0:
-                    #cas rester
-
-                    wind_to_apply = ballon.cell.get_wind(ballon.altitude)
-                    current_cell_col = ballon.cell.col
-                    current_cell_row = ballon.cell.row
-                    new_row = current_cell_row + wind_to_apply[0]
-                    new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-                    print("row,col:",[new_row,new_col])
-                    #deadcell renvoit dict id : [safe,killer,safe,safe] altitude courante = altitude-1
-                    if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude-1] == 'safe':
-                        if wind_to_apply==[0,0]:
-                            Liste_alt[ballon.altitude] = float('inf')
-                        else:
-                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
-                            Liste_alt[ballon.altitude] = dist
-                    else:
-                        Liste_alt[ballon.altitude] = float('inf')
-                    #cas monter
-                    wind_to_apply = ballon.cell.get_wind(ballon.altitude+1)
-                    current_cell_col = ballon.cell.col
-                    current_cell_row = ballon.cell.row
-                    new_row = current_cell_row + wind_to_apply[0]
-                    new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-                    print("row,col:",[new_row, new_col])
-                    if len(ballon.memoire_positions)>=3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
-                        action = randint(0, 1)
-                    else:
-
-                        if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude] == 'safe':
-                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
-                            Liste_alt[ballon.altitude+1] = dist
-                        else:
-                            Liste_alt[ballon.altitude+1]=float('inf')
-                        #choisir l'altitude à prendre
-                        dist_min=min(Liste_alt.values())
-                        print(dist_min)
-                        alt_min=trouver_cle_par_valeur(Liste_alt,dist_min)
-                        if ballon.altitude==alt_min:
-                            action = 0
-                        elif ballon.altitude<alt_min:
-                            action= 1
-                    ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col,ballon.altitude])
-                    print(ballon.memoire_positions)
-                    print(Liste_alt)
-                    print("on est à l'alt:", ballon.altitude)
-                    #print("il faut prendre l'altitude :", alt_min)
-
-                #cas pres du max altitude : descendre ou rester
-                elif ballon.altitude==g.game_map.nb_altitudes:
+                # cas pres du sol : monter ou rester
+                elif ballon.altitude - 1 == 0:
                     # cas rester
                     wind_to_apply = ballon.cell.get_wind(ballon.altitude)
-                    print("ballon id:",ballon.balloon_id)
-                    print("alt:",ballon.altitude)
+                    current_cell_col = ballon.cell.col
+                    current_cell_row = ballon.cell.row
+                    new_row = current_cell_row + wind_to_apply[0]
+                    new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
+                    # dans le cas ou la nouvelle position est dehors
+                    if new_row < 0 or new_row >= g.game_map.rows:
+                        Liste_alt[ballon.altitude] = float('inf')
+                    else:
+                        print("row,col:", [new_row, new_col])
+                        # deadcell renvoit dict id : [safe,killer,safe,safe] altitude courante = altitude-1
+                        if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude - 1] == 'safe':
+                            # rester dans sa postition si on rentre dans la zone
+                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
+                            if wind_to_apply == [0, 0]:  # and dist > ballon.coverage_radius:
+                                Liste_alt[ballon.altitude] = float('inf')
+                            else:
+                                Liste_alt[ballon.altitude] = dist
+                        else:
+                            Liste_alt[ballon.altitude] = float('inf')
+                    # cas monter
+                    wind_to_apply = ballon.cell.get_wind(ballon.altitude + 1)
+                    current_cell_col = ballon.cell.col
+                    current_cell_row = ballon.cell.row
+                    new_row = current_cell_row + wind_to_apply[0]
+                    new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
+                    print("row,col:", [new_row, new_col])
+                    if new_row < 0 or new_row >= g.game_map.rows:
+                        Liste_alt[ballon.altitude] = float('inf')
+                    else:
+                        if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude] == 'safe':
+                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
+                            if wind_to_apply == [0, 0]:  # and dist > ballon.coverage_radius:
+                                Liste_alt[ballon.altitude] = float('inf')
+                            else:
+                                Liste_alt[ballon.altitude + 1] = dist
+                        else:
+                            Liste_alt[ballon.altitude + 1] = float('inf')
+                    # choisir l'altitude à prendre
+                    dist_min = min(Liste_alt.values())
+                    print(dist_min)
+                    alt_min = trouver_cle_par_valeur(Liste_alt, dist_min)
+                    if ballon.altitude == alt_min:
+                        action = 0
+                    elif ballon.altitude < alt_min:
+                        action = 1
+                    if len(ballon.memoire_positions) >= 3 and contient_doublons(ballon.memoire_positions):
+                    #if len(ballon.memoire_positions) >= 3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
+                        """
+                        #2 dist
+                        del Liste_alt[alt_min]
+                        dist_min = min(Liste_alt.values())
+                        alt_min = trouver_cle_par_valeur(Liste_alt, dist_min)
+                        if ballon.altitude == alt_min:
+                            action = 0
+                        elif ballon.altitude < alt_min:
+                            action = 1
+                        print(ballon.memoire_positions)"""
+                        # random
+                        # action=choice([0,1])
+                        dict_id_cycle[ballon.balloon_id] = True
+                        if ballon.balloon_id not in liste_eviter:
+                            liste_eviter.append(ballon.balloon_id)
+                        print("ok")
+                        ballon.memoire_positions = []
+                    ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
+                    print(Liste_alt)
+                    print("on est à l'alt:", ballon.altitude)
+                    # print("il faut prendre l'altitude :", alt_min)
+
+                # cas pres du max altitude : descendre ou rester
+                elif ballon.altitude == g.game_map.nb_altitudes:
+                    # cas rester
+                    wind_to_apply = ballon.cell.get_wind(ballon.altitude)
+                    print("ballon id:", ballon.balloon_id)
+                    print("alt:", ballon.altitude)
                     print(wind_to_apply)
                     current_cell_col = ballon.cell.col
                     current_cell_row = ballon.cell.row
                     new_row = current_cell_row + wind_to_apply[0]
                     new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-                    print("new_row,new_col:",[new_row, new_col])
-                    #depassement de la map
-                    if ballon.altitude-1>0:
-                        if deadcells[g.game_map.cells[current_cell_row][current_cell_col].id][ballon.altitude-1] == 'safe':
-                            if wind_to_apply==[0,0]:
+                    print("new_row,new_col:", [new_row, new_col])
+
+                    if new_row < 0 or new_row >= g.game_map.rows:
+                        Liste_alt[ballon.altitude] = float('inf')
+                    else:
+                        if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude - 1] == 'safe':
+                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
+                            if wind_to_apply == [0, 0]:
                                 Liste_alt[ballon.altitude] = float('inf')
                             else:
-                                dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
                                 Liste_alt[ballon.altitude] = dist
                         else:
                             Liste_alt[ballon.altitude] = float('inf')
-                    else:
-                        Liste_alt[ballon.altitude] = float('inf')
+
                     # cas descendre
                     wind_to_apply = ballon.cell.get_wind(ballon.altitude - 1)
                     current_cell_col = ballon.cell.col
                     current_cell_row = ballon.cell.row
                     new_row = current_cell_row + wind_to_apply[0]
                     new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-                    print("row,col:",[new_row, new_col])
-                    #il faut reprogrammer deadcells
-                    if len(ballon.memoire_positions)>=3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
-                        action = randint(0, 1)
+                    print("row,col:", [new_row, new_col])
+                    # if len(ballon.memoire_positions)>=3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
+                    if new_row < 0 or new_row >= g.game_map.rows:
+                        Liste_alt[ballon.altitude] = float('inf')
                     else:
-                        if ballon.altitude - 1 > 0 :
-                            if deadcells[g.game_map.cells[current_cell_row][current_cell_col].id][ballon.altitude - 1] == 'safe':
-                                dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
-                                Liste_alt[ballon.altitude - 1] = dist
+                        if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude - 1] == 'safe':
+                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
+                            if wind_to_apply == [0, 0]:  # and dist > ballon.coverage_radius :
+                                Liste_alt[ballon.altitude] = float('inf')
                             else:
-                                Liste_alt[ballon.altitude - 1] = float('inf')
+                                Liste_alt[ballon.altitude - 1] = dist
                         else:
                             Liste_alt[ballon.altitude - 1] = float('inf')
-                        # choisir l'altitude à prendre
+
+                    # choisir l'altitude à prendre
+                    dist_min = min(Liste_alt.values())
+                    alt_min = trouver_cle_par_valeur(Liste_alt, dist_min)
+                    if ballon.altitude == alt_min:
+                        action = 0
+                    elif ballon.altitude > alt_min:
+                        action = - 1
+                    if len(ballon.memoire_positions) >= 3 and contient_doublons(ballon.memoire_positions):
+                    #if len(ballon.memoire_positions) >= 3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
+                        dict_id_cycle[ballon.balloon_id] = True
+                        if ballon.balloon_id not in liste_eviter:
+                            liste_eviter.append(ballon.balloon_id)
+                        print(ballon.memoire_positions)
+                        print("ok")
+                        ballon.memoire_positions = []
+                        """if len(ballon.memoire_positions) >= 3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
+                        del Liste_alt[alt_min]
                         dist_min = min(Liste_alt.values())
-                        alt_min=trouver_cle_par_valeur(Liste_alt,dist_min)
+                        alt_min = trouver_cle_par_valeur(Liste_alt, dist_min)
                         if ballon.altitude == alt_min:
                             action = 0
                         elif ballon.altitude > alt_min:
-                            action = - 1
+                            action = - 1"""
+                        # random
+                        # action=choice([-1,0])
                     print(Liste_alt)
                     print("on est à l'alt:", ballon.altitude)
-                    #print("il faut prendre l'altitude :", alt_min)
-                    ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col,ballon.altitude])
-                    print(ballon.memoire_positions)
-                #rester descendre ou monter
+                    print("il faut prendre l'altitude :", alt_min)
+                    ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
+                # rester descendre ou monter
                 else:
                     # cas rester
-
                     wind_to_apply = ballon.cell.get_wind(ballon.altitude)
                     current_cell_col = ballon.cell.col
                     current_cell_row = ballon.cell.row
                     new_row = current_cell_row + wind_to_apply[0]
                     new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-                    print("row,col:",[new_row, new_col])
-                    if len(ballon.memoire_positions)>=3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
-                        action = randint(-1,1)
+                    print("row,col:", [new_row, new_col])
+                    if new_row < 0 or new_row >= g.game_map.rows:
+                        Liste_alt[ballon.altitude] = float('inf')
                     else:
-                        if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude-1] == 'safe':
-                            if wind_to_apply==[0,0]:
+                        if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude - 1] == 'safe':
+                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
+                            if wind_to_apply == [0, 0]: #and dist > ballon.coverage_radius:
                                 Liste_alt[ballon.altitude] = float('inf')
                             else:
-                                dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
                                 Liste_alt[ballon.altitude] = dist
                         else:
                             Liste_alt[ballon.altitude] = float('inf')
-                        # cas monter
-                        wind_to_apply = ballon.cell.get_wind(ballon.altitude + 1)
-                        current_cell_col = ballon.cell.col
-                        current_cell_row = ballon.cell.row
-                        new_row = current_cell_row + wind_to_apply[0]
-                        new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-                        print("row,col:",[new_row, new_col])
+                    # cas monter
+                    wind_to_apply = ballon.cell.get_wind(ballon.altitude + 1)
+                    current_cell_col = ballon.cell.col
+                    current_cell_row = ballon.cell.row
+                    new_row = current_cell_row + wind_to_apply[0]
+                    new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
+                    print("row,col:", [new_row, new_col])
+                    if new_row < 0 or new_row >= g.game_map.rows:
+                        Liste_alt[ballon.altitude] = float('inf')
+                    else:
                         if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude] == 'safe':
-                            dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
-                            Liste_alt[ballon.altitude + 1] = dist
+                            if wind_to_apply == [0, 0]:
+                                Liste_alt[ballon.altitude] = float('inf')
+                            else:
+                                dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
+                                Liste_alt[ballon.altitude + 1] = dist
                         else:
                             Liste_alt[ballon.altitude + 1] = float('inf')
-                        # cas descendre
-                        wind_to_apply = ballon.cell.get_wind(ballon.altitude - 1)
-                        current_cell_col = ballon.cell.col
-                        current_cell_row = ballon.cell.row
-                        new_row = current_cell_row + wind_to_apply[0]
-                        new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
-                        print("row,col:",[new_row, new_col])
+                    # cas descendre
+                    wind_to_apply = ballon.cell.get_wind(ballon.altitude - 1)
+                    current_cell_col = ballon.cell.col
+                    current_cell_row = ballon.cell.row
+                    new_row = current_cell_row + wind_to_apply[0]
+                    new_col = (current_cell_col + wind_to_apply[1]) % g.game_map.cols
+                    print("row,col:", [new_row, new_col])
+                    if new_row < 0 or new_row >= g.game_map.rows:
+                        Liste_alt[ballon.altitude] = float('inf')
+                    else:
                         if deadcells[g.game_map.cells[new_row][new_col].id][ballon.altitude - 2] == 'safe':
                             dist = distance_cells([new_row, new_col], ballon_vers_centre[ballon.balloon_id])
-                            Liste_alt[ballon.altitude - 1] = dist
+                            if wind_to_apply == [0, 0]:
+                                Liste_alt[ballon.altitude] = float('inf')
+                            else:
+                                Liste_alt[ballon.altitude - 1] = dist
                         else:
                             Liste_alt[ballon.altitude - 1] = float('inf')
-                        # choisir l'altitude à prendre
+
+                    # choisir l'altitude à prendre
+                    dist_min = min(Liste_alt.values())
+                    alt_min = trouver_cle_par_valeur(Liste_alt, dist_min)
+                    if ballon.altitude == alt_min:
+                        action = 0
+                    elif ballon.altitude < alt_min:
+                        action = 1
+                    elif ballon.altitude > alt_min:
+                        action = - 1
+                    # si on se trouve dans un  cycle on prend la deuxieme distance la plus petite
+                    #if len(ballon.memoire_positions) >= 3 and contient_doublons(ballon.memoire_positions):
+                        """# if len(ballon.memoire_positions) >= 3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
+                        del Liste_alt[alt_min]
                         dist_min = min(Liste_alt.values())
-                        alt_min=trouver_cle_par_valeur(Liste_alt,dist_min)
+                        alt_min = trouver_cle_par_valeur(Liste_alt, dist_min)
                         if ballon.altitude == alt_min:
                             action = 0
                         elif ballon.altitude < alt_min:
                             action = 1
                         elif ballon.altitude > alt_min:
-                            action = - 1
+                            action = - 1"""
+                        # action=choice([-1,0,1])
+                    #if len(ballon.memoire_positions) >= 3 and ballon.memoire_positions[len(ballon.memoire_positions)-1]==ballon.memoire_positions[len(ballon.memoire_positions)-3]:
+                    if len(ballon.memoire_positions) >= 3 and contient_doublons(ballon.memoire_positions):
+                        dict_id_cycle[ballon.balloon_id] = True
+                        if ballon.balloon_id not in liste_eviter:
+                            liste_eviter.append(ballon.balloon_id)
+                        print(ballon.memoire_positions)
+                        print("ok")
+                        ballon.memoire_positions = []
                     print(Liste_alt)
                     print("on est à l'alt:", ballon.altitude)
-                    #print("il faut prendre l'altitude :", alt_min)
-                    ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col,ballon.altitude])
-                    print(ballon.memoire_positions)
-                print("action",action)
-                instructions.append(action)
+                    print("il faut prendre l'altitude :", alt_min)
+                    ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
+                    print("action", action)
+        instructions.append(action)
     return instructions
 
-""" wind_to_apply = ballon.cell.get_wind(ballon.altitude)
-        current_cell_col = ballon.cell.col
-        current_cell_row = ballon.cell.row
-        new_row = current_cell_row + wind_to_apply[0]
-        new_col = (current_cell_col + wind_to_apply[1]) % self.game_map.cols"""

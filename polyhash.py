@@ -2,7 +2,8 @@ import sys
 from create_game        import create_game
 from game               import Game
 from get_instructions import get_instructions
-from algos.rando_algo   import rando_algo
+from algos.rando_algo   import rando_algo1
+from algos.random_OPT import rando_algo2
 from gui                import show_game
 import time
 from algos.Main_Algo import Main_Algo
@@ -23,8 +24,8 @@ def main()-> None:
 
     game = create_game(source,DEBUG_MODE)
 
-    #algorithm = rando_algo
-    algorithm = Main_Algo
+    algorithm = rando_algo2
+    #algorithm = Main_Algo
 
     while game.turns > 0:
         MapBloc = cut_map_optimise(source)
@@ -32,8 +33,8 @@ def main()-> None:
         nb_balloon = len(game.balloons)
         dictBallonZone = assignation_ballon_vers_zones(nb_balloon, ZonesPts)
         deadcells=find_dead_cells(source)
-        instruction = get_instructions(game,algorithm,MapBloc,dictBallonZone,deadcells)
-        #instruction = get_instructions(game,algorithm)
+        #instruction = get_instructions(game,algorithm,MapBloc,dictBallonZone,deadcells)
+        instruction = get_instructions(game,algorithm)
         game.update(instruction)
         instruction_str = ""
         for balloon_cmd in instruction:
@@ -43,7 +44,7 @@ def main()-> None:
         
         if any([b.is_alive for b in game.balloons]):
              show_game(game)
-             time.sleep(2)
+             #time.sleep(2)
 
     destination_f.close()
     print("Score final : {}".format(str(game.score)))

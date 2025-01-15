@@ -4,7 +4,7 @@ from random     import *
 seed(3)
 
 #pour chaque tour il donne des instructions à tous les ballons
-def rando_algo(g : Game) -> list[int]:    
+def rando_algo1(g : Game) -> list[int]:
     instruction = []
     for balloon in g.balloons:
         if not balloon.is_alive:
