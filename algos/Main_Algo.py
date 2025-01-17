@@ -89,15 +89,13 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
             else:
                 action = randint(-1, 1)
         else:
-            # 3 solutions pour cycle : 1 random, 2 deuxieme dist, 3 attribuer centre
             if ballon.is_alive == False:
                 print("ballon mort")
-                instructions.append(0)
+                action=0
             else:
                 zone_assigne = dictBallonZone[ballon.balloon_id]
                 bloc_destination = MapBloc[zone_assigne]
                 liste_centres_bloc = Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
-                print(liste_centres_bloc)
                 Liste_alt = {}
 
 
@@ -178,8 +176,10 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                         action = 1
                     elif ballon.altitude > alt_min:
                         action = - 1
-
-
         instructions.append(action)
-    return instructions
+    if len(instructions)==len(g.balloons):
+        return instructions
+    else:
+        return [0]*len(g.balloons)
+
 

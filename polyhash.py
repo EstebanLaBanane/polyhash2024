@@ -34,7 +34,7 @@ def main()-> None:
         dictBallonZone = assignation_ballon_vers_zones(nb_balloon, ZonesPts)
         deadcells=find_dead_cells(source)
         instruction = get_instructions(game,algorithm,MapBloc,dictBallonZone,deadcells)
-        #instruction = get_instructions(game,algorithm)
+        #instruction = get_instructions(game,algorithm,deadcells)
         game.update(instruction)
         instruction_str = ""
         for balloon_cmd in instruction:
