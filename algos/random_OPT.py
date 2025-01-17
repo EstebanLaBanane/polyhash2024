@@ -53,4 +53,3 @@ def rando_algo2(g : Game) -> list[int]:
 
     return instruction
 
-#utiliser threads pour tester

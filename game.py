@@ -35,6 +35,7 @@ class Game:
               
         elif action == -1:
             if balloon.altitude <=1:
+                print("ballon dzb",balloon_id)
                 raise Exception("Action impossible (On ne pas descendre un ballon au sol une fois lancé ou en dessous le sol)")
             
             balloon.altitude -= 1

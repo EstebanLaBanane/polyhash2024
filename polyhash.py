@@ -13,7 +13,7 @@ from algos.Decoupe_OPT import cut_map_optimise
 from algos.Diriger_Ballon import assignation_ballon_vers_zones
 from algos.ZonePoints import concentration_cells_pts
 from algos.find_dead_cells import find_dead_cells
-
+global dictBallonZone
 
 def main()-> None:
     source = sys.argv[1]
@@ -24,8 +24,8 @@ def main()-> None:
 
     game = create_game(source,DEBUG_MODE)
 
-    algorithm = rando_algo2
-    #algorithm = Main_Algo
+    #algorithm = rando_algo2
+    algorithm = Main_Algo
 
     while game.turns > 0:
         MapBloc = cut_map_optimise(source)
@@ -33,8 +33,8 @@ def main()-> None:
         nb_balloon = len(game.balloons)
         dictBallonZone = assignation_ballon_vers_zones(nb_balloon, ZonesPts)
         deadcells=find_dead_cells(source)
-        #instruction = get_instructions(game,algorithm,MapBloc,dictBallonZone,deadcells)
-        instruction = get_instructions(game,algorithm)
+        instruction = get_instructions(game,algorithm,MapBloc,dictBallonZone,deadcells)
+        #instruction = get_instructions(game,algorithm)
         game.update(instruction)
         instruction_str = ""
         for balloon_cmd in instruction:
@@ -44,7 +44,7 @@ def main()-> None:
         
         if any([b.is_alive for b in game.balloons]):
              show_game(game)
-             #time.sleep(2)
+             time.sleep(2)
 
     destination_f.close()
     print("Score final : {}".format(str(game.score)))
