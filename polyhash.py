@@ -5,6 +5,7 @@ from get_instructions   import get_instructions
 from algos.rando_algo   import rando_algo
 from gui                import show_game
 import time
+from algos.algo_best_path import *
 
 
 from balloon import Balloon
@@ -14,14 +15,17 @@ def main()-> None:
     destination = sys.argv[2]
     destination_f = open(destination,'w')
 
-    DEBUG_MODE = True
+    DEBUG_MODE = False
 
     game = create_game(source,DEBUG_MODE)
 
-    algorithm = rando_algo
+    #algorithm = rando_algo
+    path = best_path(game)
+    instr = produce_instruction(path,game)
 
     while game.turns > 0:
-        instruction = get_instructions(game,algorithm)
+        #instruction = get_instructions(game,algorithm)
+        instruction = instr[game.max_turn-game.turns]
 
         game.update(instruction)
         instruction_str = ""

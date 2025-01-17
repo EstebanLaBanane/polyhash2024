@@ -6,7 +6,7 @@ from tkinter    import Canvas
 class Game:
     balloons    : list[Balloon]
     game_map    : Map
-    turns       : int
+    turns       : int   #number of turns until end
     max_turn    : int
     score       : int
     canva       : Canvas
