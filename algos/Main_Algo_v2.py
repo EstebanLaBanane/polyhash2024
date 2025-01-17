@@ -29,6 +29,9 @@ def contient_doublons(liste):
         vus.add(element)
     return False
 
+def prise_de_decision():
+
+
 def move(ballon,Liste_alt,g,deadcells,cas):
     wind_to_apply = ballon.cell.get_wind(ballon.altitude+cas)
     current_cell_col = ballon.cell.col
@@ -262,13 +265,9 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                         dict_id_cycle[ballon.balloon_id] = True
                         if ballon.balloon_id not in liste_eviter:
                             liste_eviter.append(ballon.balloon_id)
-                        print(ballon.memoire_positions)
                         ballon.memoire_positions = []
-                    print(Liste_alt)
-                    print("on est à l'alt:", ballon.altitude)
-                    print("il faut prendre l'altitude :", alt_min)
+
                     ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
-        print("action", action)
         instructions.append(action)
     return instructions
 
