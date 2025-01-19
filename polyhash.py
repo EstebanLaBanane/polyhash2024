@@ -7,13 +7,14 @@ from algos.random_OPT import rando_algo2
 from gui                import show_game
 import time
 from algos.Main_Algo import Main_Algo
-
+from algos.Main_Algo_v2 import Main_Algo_v2
+from algos.Main_Algo_v3 import Main_Algo_v3
 from balloon import Balloon
 from algos.Decoupe_OPT import cut_map_optimise
 from algos.Diriger_Ballon import assignation_ballon_vers_zones
 from algos.ZonePoints import concentration_cells_pts
 from algos.find_dead_cells import find_dead_cells
-global dictBallonZone
+
 
 def main()-> None:
     source = sys.argv[1]
@@ -25,7 +26,9 @@ def main()-> None:
     game = create_game(source,DEBUG_MODE)
 
     #algorithm = rando_algo2
-    algorithm = Main_Algo
+    #algorithm = Main_Algo
+    #algorithm = Main_Algo_v2
+    algorithm = Main_Algo_v3
 
     while game.turns > 0:
         MapBloc = cut_map_optimise(source)
