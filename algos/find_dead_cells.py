@@ -32,4 +32,3 @@ def find_dead_cells(filepath):
     return health_cells
 
 
-#print(find_dead_cells("../challenges/c_medium.in"))

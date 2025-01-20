@@ -49,10 +49,6 @@ def cut_map(filepath):
 
     return half_map_col_left, half_map_col_right, half_map_row_left, half_map_row_right
 
-#print(cut_map("../challenges/a_example.in")[0])
-#print(cut_map("../challenges/a_example.in")[1])
-#print(cut_map("../challenges/a_example.in")[2])
-#print(cut_map("../challenges/a_example.in")[3])
 
 
 

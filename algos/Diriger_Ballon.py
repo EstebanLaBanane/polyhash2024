@@ -88,6 +88,3 @@ def assignation_ballon_vers_zones(nb_balloon:int,ZonesPts:dict):
 
 
 
-"""nb_balloon=10
-ZonesPts={0: 6, 1: 0, 2: 0, 3: 13, 4: 36, 5: 13, 6: 6, 7: 42, 8: 6, 9: 0, 10: 0, 11: 23, 12: 54, 13: 35, 14: 43, 15: 49, 16: 85, 17: 10, 18: 25, 19: 13, 20: 8, 21: 0, 22: 23, 23: 85, 24: 29, 25: 2, 26: 38, 27: 48, 28: 29, 29: 20, 30: 109, 31: 116}
-print(assignation_ballon_vers_zones(nb_balloon,ZonesPts))"""

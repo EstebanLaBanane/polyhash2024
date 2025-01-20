@@ -10,7 +10,6 @@ def distance_cells(bal_cords,tar_cords):
 
     return distance
 
-print(distance_cells([0,1],[0,3]))
 
 
 

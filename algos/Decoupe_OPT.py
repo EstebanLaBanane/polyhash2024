@@ -106,14 +106,3 @@ def display(blocks, blocks_per_row):
     # Retourner la chaîne combinée
     return "\n".join(map_rows)
 
-"""
-#retour de la fonction
-print(cut_map_optimise("../challenges/c_medium.in"))
-
-#pour voir les blocs
-zone_eff=(2*4+1)**2
-
-col_eff=(zone_eff)**(1/2)
-nb_col=80
-print(display(cut_map_optimise("../challenges/c_medium.in"),int(nb_col//col_eff)))
-"""

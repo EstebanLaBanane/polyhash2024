@@ -43,8 +43,7 @@ def score_of_cells(filepath):
 
 
 
-#print(score_of_cells("../challenges/c_medium.in"))
-#idée: il faut trouver des patterns de suite de chiffres >0 de suite. exemple : "1 3 4 5 54 8 9"
+
 
 
 
