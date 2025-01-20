@@ -22,6 +22,7 @@ def check(ballon,g,action,deadcells):
 #pour chaque tour il donne des instructions à tous les ballons
 def rando_algo2(g : Game,deadcells) -> list[int]:
     instruction = []
+    #on met une limite de 20 pour voir si il y a une action qui tue pas quand on est dans une case
     limite=0
     for balloon in g.balloons:
         if not balloon.is_alive:
@@ -44,6 +45,7 @@ def rando_algo2(g : Game,deadcells) -> list[int]:
                 if limite==20:
                     break
                 limite+=1
+
         #autre cas
         else:
             action = randint(-1,1)

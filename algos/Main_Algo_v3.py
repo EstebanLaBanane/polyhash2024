@@ -4,7 +4,6 @@ from game import Game
 from random     import *
 import map
 
-#un dictionnaire globale sous forme de idBallon : coord [34,32]
 from .distance_cells import distance_cells
 import json
 from pathlib import Path
@@ -21,6 +20,7 @@ liste_eviter = []
 # Fichier pour sauvegarder les variables globales
 SAVE_FILE = "globals_state.json"
 
+#permet la sauvegarde des données même après la fermeture du fichier
 def sauvegarder_etat():
     """Sauvegarde l'état des variables globales dans un fichier JSON."""
     etat = {
@@ -47,7 +47,7 @@ def charger_etat():
 # Appel du chargement au démarrage
 charger_etat()
 
-
+#permet de savoir si il y a des doublons dans une liste
 def contient_doublons(liste):
     vus = set()
     for element in liste:
@@ -58,6 +58,7 @@ def contient_doublons(liste):
         vus.add(element)
     return False
 
+#prend la decision dans le choix de quelle altitude prendre
 def prise_de_decision(Liste_alt,ballon):
     dist_min = min(Liste_alt.values())
     alt_min = trouver_cle_par_valeur(Liste_alt, dist_min)
@@ -69,6 +70,7 @@ def prise_de_decision(Liste_alt,ballon):
         action = - 1
     return action
 
+#calcul de distance entre ballon et destination dans les differentes altitudes
 def move(ballon,Liste_alt,g,deadcells,cas):
     wind_to_apply = ballon.cell.get_wind(ballon.altitude+cas)
     current_cell_col = ballon.cell.col
@@ -88,13 +90,14 @@ def move(ballon,Liste_alt,g,deadcells,cas):
         else:
             Liste_alt[ballon.altitude+cas] = float('inf')
 
-
+#permet de trouver la cle à travers la valeur
 def trouver_cle_par_valeur(dictionnaire, valeur_recherchee):
     for cle, valeur in dictionnaire.items():
         if valeur == valeur_recherchee:
             return cle
     return None
 
+#attribue un centre unique au ballon
 def attribuer_centre_unique(ballon, liste_centres_bloc):
     global ballon_vers_centre
     centre=[]
@@ -114,7 +117,7 @@ def attribuer_centre_unique(ballon, liste_centres_bloc):
             ballon_vers_centre[ballon.balloon_id] = centre
 
 
-
+#attribue un centre d'index 0 de la liste des centres au ballon
 def attribuer_centre(ballon,liste_centres_bloc):
     global ballon_vers_centre
     if  isinstance(liste_centres_bloc,list) and all(isinstance(x, int) for x in liste_centres_bloc) and len(liste_centres_bloc) == 2:
@@ -125,25 +128,23 @@ def attribuer_centre(ballon,liste_centres_bloc):
         ballon_vers_centre[ballon.balloon_id] = centre
 
 
-
+#fonction qui permet de detecter si un ballon est dans un cycle
 def detection_de_cycle(ballon):
     if len(ballon.memoire_positions) >= 3 and contient_doublons(ballon.memoire_positions):
         if ballon.balloon_id not in liste_eviter:
             liste_eviter.append(ballon.balloon_id)
         ballon.memoire_positions = []
 
-
-def attribution_centre(ballon,bloc_destination,liste_centres_bloc):
+#attribue au ballon un centre
+def attribution_centre(ballon,liste_centres_bloc):
     if ballon.balloon_id not in ballon_vers_centre.keys():
-        if [ballon.cell.row, ballon.cell.col] in bloc_destination:
-            if attribuer_centre_unique(ballon, liste_centres_bloc) != None:
-                attribuer_centre_unique(ballon, liste_centres_bloc)
-            else:
-                attribuer_centre(ballon, liste_centres_bloc)
+        if attribuer_centre_unique(ballon, liste_centres_bloc) != None:
+            attribuer_centre_unique(ballon, liste_centres_bloc)
         else:
             attribuer_centre(ballon, liste_centres_bloc)
 
-#random optimisé
+
+#random optimisé : lance les ballons d'une manière optimale, les ballons ne sortent pas de la map
 def mode_random(balloon,g,deadcells,limite):
     if not balloon.is_alive:
         action = 0
@@ -176,6 +177,7 @@ def mode_random(balloon,g,deadcells,limite):
     limite=0
     return action
 
+#elimine les doublons d'une liste
 def eliminer_doublons(liste):
     vus = set()
     liste_sans_doublons = []
@@ -185,7 +187,7 @@ def eliminer_doublons(liste):
             vus.add(element)
     return liste_sans_doublons
 
-
+#permet de verifier si le ballon va sortir de la map dans une certaine altitude
 def check(ballon,g,action,deadcells):
     wind_to_apply = ballon.cell.get_wind(ballon.altitude+action)
     current_cell_row = ballon.cell.row
@@ -214,11 +216,10 @@ def Main_Algo_v3(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
     row_eff = (zone_eff) ** (1 / 2)
     col_eff = (zone_eff) ** (1 / 2)
     for ballon in g.balloons:
-        #on commence par voir si on est dans le tour de random du debut:
+        #dans les 10 premiers tours on lance les ballon aleatoirement pour une meilleur repartition
         if g.turns != g.max_turn and g.turns >= g.max_turn-10:
             action=mode_random(ballon,g,deadcells,limite)
         else:
-            # 3 solutions pour cycle : 1 random, 2 deuxieme dist, 3 attribuer centre
             if ballon.is_alive == False:
                 print("ballon mort")
                 instructions.append(0)
@@ -226,26 +227,18 @@ def Main_Algo_v3(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
 
 
                 Liste_alt = {}
-                #si on fait 10 tours on efface la mémoire
+                #si on fait 20 tours on efface la mémoire
                 i=20
                 if g.turns%i==0:
                     ballon.memoire_positions.clear()
 
+                #assignation des centres
                 zone_assigne = dictBallonZone[ballon.balloon_id]
                 bloc_destination = MapBloc[zone_assigne]
                 liste_centres_bloc = Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
-                attribution_centre(ballon, bloc_destination, liste_centres_bloc)
+                attribution_centre(ballon, liste_centres_bloc)
 
-                print("dict_ballon_zone",dictBallonZone)
-                print("a eviter:",liste_eviter)
-                print("balon id :",ballon.balloon_id)
-                print("turns :",g.turns)
-                print(liste_centres_bloc)
-                print(ballon_vers_centre)
-                # aller vers le centre
-                # pour  altitude en 0 et 1 et -1 on met la distance entre la nouvelle cellule du ballon et target
 
-                # probleme ici
                 # cas sol : monter
                 if ballon.altitude == 0:
                     action = 1
@@ -256,6 +249,7 @@ def Main_Algo_v3(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                     # cas rester
                     cas=0
                     move(ballon,Liste_alt, g, deadcells, cas)
+
                     # cas monter
                     cas=1
                     move(ballon, Liste_alt, g, deadcells, cas)
@@ -263,12 +257,11 @@ def Main_Algo_v3(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                     # choisir l'altitude à prendre
                     action=prise_de_decision(Liste_alt, ballon)
 
+                    #detection de cycle
                     detection_de_cycle(ballon)
 
                     ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
-                    print(Liste_alt)
-                    print("on est à l'alt:", ballon.altitude)
-                    #print("il faut prendre l'altitude :", alt_min)
+
 
                 # cas pres du max altitude : descendre ou rester
                 elif ballon.altitude == g.game_map.nb_altitudes:
@@ -283,17 +276,21 @@ def Main_Algo_v3(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                     # choisir l'altitude à prendre
                     action=prise_de_decision(Liste_alt, ballon)
 
+                    #detection de cycle
                     detection_de_cycle(ballon)
 
                     ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
-                # rester descendre ou monter
+
+                # autre cas : rester descendre ou monter
                 else:
                     # cas rester
                     cas=0
                     move(ballon, Liste_alt, g, deadcells, cas)
+
                     # cas monter
                     cas = 1
                     move(ballon, Liste_alt, g, deadcells, cas)
+
                     # cas descendre
                     cas=-1
                     move(ballon, Liste_alt, g, deadcells, cas)
@@ -301,12 +298,15 @@ def Main_Algo_v3(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                     # choisir l'altitude à prendre
                     action=prise_de_decision(Liste_alt, ballon)
 
+                    #detection de cycle
                     detection_de_cycle(ballon)
 
                     ballon.memoire_positions.append([ballon.cell.row, ballon.cell.col, ballon.altitude])
 
+                #si ballon dans un cycle : random optimisé
                 if ballon.balloon_id in liste_eviter:
                     action=mode_random(ballon,g,deadcells,limite)
+
         instructions.append(action)
     if len(instructions)==len(g.balloons):
         return instructions

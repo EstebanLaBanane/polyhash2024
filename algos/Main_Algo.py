@@ -9,6 +9,7 @@ from .distance_cells import distance_cells
 global ballon_vers_centre
 ballon_vers_centre={}
 
+#calcul de distance entre ballon et destination dans les differentes altitudes
 
 def move(ballon,Liste_alt,g,deadcells,cas):
     wind_to_apply = ballon.cell.get_wind(ballon.altitude+cas)
@@ -29,12 +30,15 @@ def move(ballon,Liste_alt,g,deadcells,cas):
             Liste_alt[ballon.altitude+cas] = float('inf')
 
 
+#permet de trouver la cle à travers la valeur
 def trouver_cle_par_valeur(dictionnaire, valeur_recherchee):
     for cle, valeur in dictionnaire.items():
         if valeur == valeur_recherchee:
             return cle
     return None
 
+
+#attribue un centre unique au ballon
 def attribuer_centre_unique(ballon, liste_centres_bloc):
     global ballon_vers_centre
     centre=[]
@@ -53,7 +57,7 @@ def attribuer_centre_unique(ballon, liste_centres_bloc):
         else:
             ballon_vers_centre[ballon.balloon_id] = centre
 
-
+#attribue un centre d'index 0 de la liste des centres au ballon
 def attribuer_centre(ballon,liste_centres_bloc):
     global ballon_vers_centre
     if  isinstance(liste_centres_bloc,list) and all(isinstance(x, int) for x in liste_centres_bloc) and len(liste_centres_bloc) == 2:
@@ -66,7 +70,7 @@ def attribuer_centre(ballon,liste_centres_bloc):
 
 
 
-#Pointscentrebloc
+
 def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
     global ballon_vers_centre
     instructions=[]
@@ -78,7 +82,7 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
     row_eff = (zone_eff) ** (1 / 2)
     col_eff = (zone_eff) ** (1 / 2)
     for ballon in g.balloons:
-        #on commence par voir si on est dans le tour de random du debut:
+        #dans les 10 premiers tours on lance les ballon aleatoirement pour une meilleur repartition
         if g.turns != g.max_turn and g.turns > g.max_turn-10:
             if not ballon.is_alive:
                 action = 0
@@ -93,20 +97,19 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                 print("ballon mort")
                 action=0
             else:
+                #calcul des centres pour la zone assigné au ballon
                 zone_assigne = dictBallonZone[ballon.balloon_id]
                 bloc_destination = MapBloc[zone_assigne]
                 liste_centres_bloc = Points_Centre_Bloc(bloc_destination, row_eff, col_eff, row_map, col_map)
                 Liste_alt = {}
 
-
+                #attribution des centres
                 if ballon.balloon_id not in ballon_vers_centre.keys():
-                    if [ballon.cell.row, ballon.cell.col] in bloc_destination:
-                        if attribuer_centre_unique(ballon, liste_centres_bloc) != None:
-                            attribuer_centre_unique(ballon, liste_centres_bloc)
-                        else:
-                            attribuer_centre(ballon, liste_centres_bloc)
+                    if attribuer_centre_unique(ballon, liste_centres_bloc) != None:
+                        attribuer_centre_unique(ballon, liste_centres_bloc)
                     else:
                         attribuer_centre(ballon, liste_centres_bloc)
+
 
 
                 # cas sol : monter
@@ -136,6 +139,7 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
 
                 # cas pres du max altitude : descendre ou rester
                 elif ballon.altitude == g.game_map.nb_altitudes:
+
                     # cas rester
                     cas=0
                     move(ballon,Liste_alt,g,deadcells,cas)
@@ -153,7 +157,7 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                         action = - 1
 
 
-                # rester descendre ou monter
+                # autre cas : rester descendre ou monter
                 else:
                     # cas rester
                     cas=0
@@ -176,7 +180,9 @@ def Main_Algo(g:Game,MapBloc,dictBallonZone,deadcells)->list[int]:
                         action = 1
                     elif ballon.altitude > alt_min:
                         action = - 1
+
         instructions.append(action)
+
     if len(instructions)==len(g.balloons):
         return instructions
     else:
